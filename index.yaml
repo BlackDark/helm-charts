@@ -1,0 +1,25 @@
+apiVersion: v1
+entries:
+  dawarich:
+  - apiVersion: v2
+    appVersion: 0.22.3
+    created: "2025-01-20T13:56:18.158083129Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 16.4.3
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 20.6.3
+    description: Self-hosted alternative to Google Location History
+    digest: 9243f317baa84b7e549c5df52e2659d010ae153424c03a22cd97df9ee6c8e666
+    name: dawarich
+    sources:
+    - https://dawarich.app
+    type: application
+    urls:
+    - https://github.com/BlackDark/helm-charts/releases/download/dawarich-0.1.0/dawarich-0.1.0.tgz
+    version: 0.1.0
+generated: "2025-01-20T13:56:18.15808915Z"
