@@ -35,21 +35,24 @@ dawarich:
         - "sh"
         - "-c"
         - "wget -qO - http://127.0.0.1:3000/api/v1/health | grep -q '\"status\"\\s*:\\s*\"ok\"'"
+    timeoutSeconds: 3
   readinessProbe:
     exec:
       command:
         - "sh"
         - "-c"
         - "wget -qO - http://127.0.0.1:3000/api/v1/health | grep -q '\"status\"\\s*:\\s*\"ok\"'"
+    timeoutSeconds: 3
   startupProbe:
     exec:
       command:
         - "sh"
         - "-c"
         - "wget -qO - http://127.0.0.1:3000/api/v1/health | grep -q '\"status\"\\s*:\\s*\"ok\"'"
-    initialDelaySeconds: 5
+    initialDelaySeconds: 15
     periodSeconds: 10
     failureThreshold: 10
+    timeoutSeconds: 3
 
   resources:
     {}
@@ -84,21 +87,24 @@ sidekiq:
         - "sh"
         - "-c"
         - "bundle exec sidekiqmon processes | grep $${HOSTNAME}"
+    timeoutSeconds: 3
   readinessProbe:
     exec:
       command:
         - "sh"
         - "-c"
         - "bundle exec sidekiqmon processes | grep $${HOSTNAME}"
+    timeoutSeconds: 3
   startupProbe:
     exec:
       command:
         - "sh"
         - "-c"
         - "bundle exec sidekiqmon processes | grep $${HOSTNAME}"
-    initialDelaySeconds: 30
+    initialDelaySeconds: 15
     periodSeconds: 10
     failureThreshold: 10
+    timeoutSeconds: 3
   env: []
   # - name: ENV_NAME
   #   value: ENV_VALUE
