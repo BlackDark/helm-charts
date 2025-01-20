@@ -1,9 +1,11 @@
 # Dawarich
 
+Github: https://github.com/BlackDark/helm-charts
+
 Self-hosted alternative to Google Location History
 
 **This chart is not maintained by the upstream project and any issues with the chart should be raised
-[here](https://github.com/Cogitri/charts/issues/new)**
+[here](https://github.com/BlackDark/helm-charts/issues/new)**
 
 ## Source Code
 
@@ -23,15 +25,7 @@ To install the chart with the release name `dawarich`
 ### OCI (Recommended)
 
 ```console
-helm install dawarich oci://ghcr.io/cogitri/charts/dawarich
-```
-
-### Traditional
-
-```console
-helm repo add cogitri https://charts.cogitri.dev
-helm repo update
-helm install dawarich cogitri/dawarich
+helm install dawarich oci://ghcr.io/blackdark/charts/dawarich
 ```
 
 ## Values
