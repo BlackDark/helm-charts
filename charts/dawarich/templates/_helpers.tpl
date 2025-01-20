@@ -92,11 +92,6 @@ Create the name of the service account to use
 {{- end }}
 
 {{- define "dawarich.volumes" -}}
-{{- if .Values.persistence.gemCache.enabled }}
-- name: gem-cache
-  persistentVolumeClaim:
-    claimName: {{ default (printf "%s-gem-cache" (include "dawarich.fullname" .)) .Values.persistence.gemCache.existingClaim }}
-{{- end }}
 {{- if .Values.persistence.public.enabled }}
 - name: public
   persistentVolumeClaim:
@@ -113,10 +108,6 @@ Create the name of the service account to use
 {{- end }}
 
 {{- define "dawarich.volumeMounts" -}}
-{{- if .Values.persistence.gemCache.enabled }}
-- name: gem-cache
-  mountPath: /usr/local/bundle/gems
-{{- end }}
 {{- if .Values.persistence.public.enabled }}
 - name: public
   mountPath: /var/app/public
@@ -131,10 +122,6 @@ Create the name of the service account to use
 {{- end }}
 
 {{- define "dawarich.sidekiqVolumeMounts" -}}
-{{- if .Values.persistence.gemCache.enabled }}
-- name: gem-cache
-  mountPath: /usr/local/bundle/gems
-{{- end }}
 {{- if .Values.persistence.public.enabled }}
 - name: public
   mountPath: /var/app/public
@@ -149,6 +136,21 @@ Create the name of the service account to use
 - configMapRef:
     name: {{ include "dawarich.fullname" . }}-config
 {{- end }}
+
+
+{{- define "applicationHosts" -}}
+{{- $defaultApplicationHosts := list "localhost" "::1" "127.0.0.1" -}}
+{{- $userApplicationHosts := splitList "," (required "applicationHosts must be specified" .Values.applicationHosts) -}}
+{{- join "," (concat $defaultApplicationHosts $userApplicationHosts) | quote -}}
+{{- end -}}
+
+
+
+
+
+# Usage:
+value: {{ include "joinValues" (list (list "static" "new") .Values.userValue) | quote }}
+
 
 {{- define "dawarich.env" -}}
 {{- with .Values.postgresql }}
@@ -182,7 +184,23 @@ Create the name of the service account to use
       {{- end }}
 - name: REDIS_URL
   value: redis://{{ .auth.username }}:$(A_REDIS_PASSWORD)@{{ $.Release.Name }}-redis-master
+- name: RAILS_ENV
+  value: production
+- name: RAILS_LOG_TO_STDOUT
+  value: "true"
 {{- end }}
+- name: SECRET_KEY_BASE
+  valueFrom:
+    secretKeyRef:
+      {{- if and (not .Values.existingSecretKeyBase) (.Values.secretKeyBase) }}
+      name: {{ include "dawarich.fullname" . }}-app
+      key: secretKeyBase
+      {{- else }}
+      name: {{ .Values.existingSecretKeyBase.secret }}
+      key: {{ .Values.existingSecretKeyBase.key }}
+      {{- end }}
+- name: APPLICATION_HOSTS
+  value: {{ include "applicationHosts" . }}
 {{- end }}
 
 {{- define "dawarich.initContainers" }}

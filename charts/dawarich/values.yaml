@@ -12,7 +12,6 @@ image:
 
 env:
   minMinutesSpentInCity: "60"
-  applicationHost: "dawarich.example.org"
   timeZone: "Europe/Berlin"
   backgroundProcessingConcurrency: "10"
   applicationProtocol: "http"
@@ -20,27 +19,40 @@ env:
   photonApiHost: "photon.komoot.io"
   photonApiUseHttps: "true"
 
+applicationHosts: "dawarich.example.org" # comma separated list
+secretKeyBase: "1234567890" # changeme
+# existingSecretKeyBase:
+#   secret: somesecret
+#   key: somekeyinsecret
+
 dawarich:
   replicaCount: 1
 
   # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
   livenessProbe:
-    httpGet:
-      path: /api/v1/health
-      port: http
+    exec:
+      command:
+        - "sh"
+        - "-c"
+        - "wget -qO - http://127.0.0.1:3000/api/v1/health | grep -q '\"status\"\\s*:\\s*\"ok\"'"
   readinessProbe:
-    httpGet:
-      path: /api/v1/health
-      port: http
+    exec:
+      command:
+        - "sh"
+        - "-c"
+        - "wget -qO - http://127.0.0.1:3000/api/v1/health | grep -q '\"status\"\\s*:\\s*\"ok\"'"
   startupProbe:
-    httpGet:
-      path: /api/v1/health
-      port: http
-    initialDelaySeconds: 30
+    exec:
+      command:
+        - "sh"
+        - "-c"
+        - "wget -qO - http://127.0.0.1:3000/api/v1/health | grep -q '\"status\"\\s*:\\s*\"ok\"'"
+    initialDelaySeconds: 5
     periodSeconds: 10
     failureThreshold: 10
 
-  resources: {}
+  resources:
+    {}
     # We usually recommend not to specify default resources and to leave this as a conscious
     # choice for the user. This also increases chances charts run on environments with little
     # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -58,6 +70,10 @@ dawarich:
 
   affinity: {}
 
+  env: []
+  # - name: ENV_NAME
+  #   value: ENV_VALUE
+
 sidekiq:
   replicaCount: 1
 
@@ -67,24 +83,28 @@ sidekiq:
       command:
         - "sh"
         - "-c"
-        - "bundle exec sidekiqmon processes | grep ${HOSTNAME}"
+        - "bundle exec sidekiqmon processes | grep $${HOSTNAME}"
   readinessProbe:
     exec:
       command:
         - "sh"
         - "-c"
-        - "bundle exec sidekiqmon processes | grep ${HOSTNAME}"
+        - "bundle exec sidekiqmon processes | grep $${HOSTNAME}"
   startupProbe:
     exec:
       command:
         - "sh"
         - "-c"
-        - "bundle exec sidekiqmon processes | grep ${HOSTNAME}"
+        - "bundle exec sidekiqmon processes | grep $${HOSTNAME}"
     initialDelaySeconds: 30
     periodSeconds: 10
     failureThreshold: 10
+  env: []
+  # - name: ENV_NAME
+  #   value: ENV_VALUE
 
-  resources: {}
+  resources:
+    {}
     # We usually recommend not to specify default resources and to leave this as a conscious
     # choice for the user. This also increases chances charts run on environments with little
     # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -103,13 +123,6 @@ sidekiq:
   affinity: {}
 
 persistence:
-  gemCache:
-    enabled: true
-    existingClaim: ""
-    annotations: []
-    accessMode: "ReadWriteOnce"
-    storageClass: ""
-    size: 1Gi
   public:
     enabled: true
     existingClaim: ""
@@ -126,6 +139,7 @@ persistence:
     size: 10Gi
 
 postgresql:
+  enabled: true
   auth:
     # Either set the postgresql credentials in the helm chart, or provide your own secret.
     database: dawarich
@@ -150,6 +164,7 @@ postgresql:
     sizeLimit: 1Gi
 
 redis:
+  enabled: true
   auth:
     enabled: true
     password: changeme
@@ -187,10 +202,12 @@ podAnnotations: {}
 # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 podLabels: {}
 
-podSecurityContext: {}
+podSecurityContext:
+  {}
   # fsGroup: 2000
 
-securityContext: {}
+securityContext:
+  {}
   # capabilities:
   #   drop:
   #   - ALL
@@ -209,7 +226,8 @@ service:
 ingress:
   enabled: false
   className: ""
-  annotations: {}
+  annotations:
+    {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
