@@ -1,25 +1,74 @@
-1. Get the application URL by running these commands:
-{{- if .Values.ingress.enabled }}
-{{- range $host := .Values.ingress.hosts }}
-  {{- range .paths }}
-  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
-  {{- end }}
-{{- end }}
-{{- else if contains "NodePort" .Values.service.type }}
-  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "dawarich.fullname" . }})
-  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
-  echo http://$NODE_IP:$NODE_PORT
-{{- else if contains "LoadBalancer" .Values.service.type }}
-     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-           You can watch its status by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "dawarich.fullname" . }}'
-  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "dawarich.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
-  echo http://$SERVICE_IP:{{ .Values.service.port }}
-{{- else if contains "ClusterIP" .Values.service.type }}
-  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "dawarich.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
-  export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
-  echo "Visit http://127.0.0.1:8080 to use your application"
-  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:$CONTAINER_PORT
-{{- end }}
-2. Wait for the dawarich Pod to be ready (it takes up to a minute until postgresql & redis are ready for dawarich to function)
-3. Login with the default username (user@domain.com) and password (password)
-4. Click on the top-right button ("user@domain.com") -> "Account" to edit the email and password of the default account.
+Dawarich has been deployed successfully!
+======================================
+
+CONFIGURATION REQUIRED:
+======================
+
+Two things need to be configured:
+
+1. Static Configuration (config dict) - values written to ConfigMap
+2. Secrets & External References (env array) - database/Redis connections
+
+MINIMAL REQUIRED CONFIGURATION:
+==============================
+
+env:
+  # Database - REQUIRED
+  - name: DATABASE_HOST
+    valueFrom:
+      secretKeyRef:
+        name: postgres-secret
+        key: host
+  - name: DATABASE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: postgres-secret
+        key: password
+  
+  # Redis - REQUIRED
+  - name: REDIS_URL
+    valueFrom:
+      secretKeyRef:
+        name: redis-secret
+        key: url
+
+# Optional: Auto-generate the SECRET_KEY_BASE secret
+# secretKeyBase: "generate-a-secure-random-string-here"
+
+# Optional: Customize application behavior
+config:
+  APPLICATION_HOSTS: "dawarich.example.com"
+  TIME_ZONE: "America/New_York"
+  DISTANCE_UNIT: "mi"
+
+NEXT STEPS:
+===========
+
+1. Create Kubernetes secrets for your database and Redis:
+   kubectl create secret generic postgres-secret \
+     --from-literal=host=your-postgres-host \
+     --from-literal=password=your-password \
+     --from-literal=username=dawarich
+
+   kubectl create secret generic redis-secret \
+     --from-literal=url=redis://...
+
+2. Optionally, generate the SECRET_KEY_BASE secret:
+   kubectl create secret generic dawarich-app \
+     --from-literal=secretKeyBase=$(openssl rand -hex 32)
+
+   Or provide secretKeyBase in values.yaml to auto-generate it.
+
+3. Update your values.yaml with the configuration above
+
+4. Upgrade the Helm release:
+   helm upgrade dawarich dawarich/dawarich -f values.yaml
+
+For complete documentation and setup options, see:
+https://github.com/marbaced/helm-charts/blob/main/charts/dawarich/README.md
+
+MIGRATION GUIDE:
+See: https://github.com/marbaced/helm-charts/blob/main/MIGRATION.md
+
+
+
