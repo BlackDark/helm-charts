@@ -138,76 +138,19 @@ Create the name of the service account to use
 {{- end }}
 
 
-{{- define "applicationHosts" -}}
-{{- $defaultApplicationHosts := list "localhost" "::1" "127.0.0.1" -}}
-{{- $userApplicationHosts := splitList "," (required "applicationHosts must be specified" .Values.applicationHosts) -}}
-{{- join "," (concat $defaultApplicationHosts $userApplicationHosts) | quote -}}
-{{- end -}}
-
-
-
-
-
-# Usage:
-value: {{ include "joinValues" (list (list "static" "new") .Values.userValue) | quote }}
 
 
 {{- define "dawarich.env" -}}
-{{- with .Values.postgresql }}
-- name: DATABASE_HOST
-  value: {{ $.Release.Name }}-postgresql
-- name: DATABASE_NAME
-  value: {{ .auth.database }}
-- name: DATABASE_USERNAME
-  value: {{ default "postgres" .auth.username }}
-- name: DATABASE_PASSWORD
+{{- range $item := .Values.env }}
+- name: {{ $item.name }}
+  {{- if $item.value }}
+  value: {{ $item.value | quote }}
+  {{- else if $item.valueFrom }}
   valueFrom:
-    secretKeyRef:
-      {{- if .auth.existingSecret }}
-      name: {{ .auth.existingSecret }}
-      key: password
-      {{- else }}
-      name: {{ $.Release.Name }}-postgresql
-      key: {{ if not .auth.password }}postgres-{{ end }}password
-      {{- end }}
+    {{- toYaml $item.valueFrom | nindent 4 }}
+  {{- end }}
 {{- end }}
-{{- with .Values.redis }}
-- name: A_REDIS_PASSWORD
-  valueFrom:
-    secretKeyRef:
-      {{- if .auth.existingSecret }}
-      name: {{ .auth.existingSecret }}
-      key: redis-password
-      {{- else }}
-      name: {{ $.Release.Name }}-redis
-      key: redis-password
-      {{- end }}
-- name: REDIS_URL
-  value: redis://{{ .auth.username }}:$(A_REDIS_PASSWORD)@{{ $.Release.Name }}-redis-master
-- name: RAILS_ENV
-  value: production
-- name: RAILS_LOG_TO_STDOUT
-  value: "true"
-{{- end }}
-- name: SECRET_KEY_BASE
-  valueFrom:
-    secretKeyRef:
-      {{- if and (not .Values.existingSecretKeyBase) (.Values.secretKeyBase) }}
-      name: {{ include "dawarich.fullname" . }}-app
-      key: secretKeyBase
-      {{- else }}
-      name: {{ .Values.existingSecretKeyBase.secret }}
-      key: {{ .Values.existingSecretKeyBase.key }}
-      {{- end }}
-- name: APPLICATION_HOSTS
-  value: {{ include "applicationHosts" . }}
 {{- end }}
 
 {{- define "dawarich.initContainers" }}
-- name: wait-for-postgres
-  image: busybox
-  command: ['sh', '-c', 'until nc -z {{ printf "%s-postgresql" .Release.Name }} 5432; do echo waiting for postgres; sleep 2; done;']
-- name: wait-for-redis
-  image: busybox
-  command: ['sh', '-c', 'until nc -z {{ printf "%s-redis-master" .Release.Name }} 6379; do echo waiting for redis; sleep 2; done;']
 {{- end }}

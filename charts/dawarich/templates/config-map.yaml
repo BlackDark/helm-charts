@@ -5,5 +5,8 @@ metadata:
   labels:
     {{- include "dawarich.labels" . | nindent 4 }}
 data:
-  RAILS_ENV: "development"
-  {{- include "dawarich.environmentSetup" (dict "environment" .Values.env)}}
+  {{- range $key, $value := .Values.config }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+
+

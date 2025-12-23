@@ -10,20 +10,70 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
-env:
-  minMinutesSpentInCity: "60"
-  timeZone: "Europe/Berlin"
-  backgroundProcessingConcurrency: "10"
-  applicationProtocol: "http"
-  distanceUnit: "km"
-  photonApiHost: "photon.komoot.io"
-  photonApiUseHttps: "true"
+# Static configuration values (written to ConfigMap)
+# These are simple key-value pairs that don't need secrets
+config:
+  MIN_MINUTES_SPENT_IN_CITY: "60"
+  TIME_ZONE: "Europe/Berlin"
+  BACKGROUND_PROCESSING_CONCURRENCY: "10"
+  APPLICATION_PROTOCOL: "http"
+  DISTANCE_UNIT: "km"
+  PHOTON_API_HOST: "photon.komoot.io"
+  PHOTON_API_USE_HTTPS: "true"
+  # Rails configuration
+  RAILS_CACHE_DB: "0"
+  RAILS_JOB_QUEUE_DB: "1"
+  RAILS_WS_DB: "2"
+  RAILS_ENV: "production"
+  RAILS_LOG_TO_STDOUT: "true"
+  APPLICATION_HOSTS: "localhost,::1,127.0.0.1,dawarich.example.org"
 
-applicationHosts: "dawarich.example.org" # comma separated list
-secretKeyBase: "1234567890" # changeme
-# existingSecretKeyBase:
-#   secret: somesecret
-#   key: somekeyinsecret
+# Secret/external environment variables applied to all deployments (dawarich and sidekiq)
+# Required: DATABASE_HOST, DATABASE_PASSWORD, REDIS_URL
+# Each item can use either 'value' or 'valueFrom' (secretKeyRef, configMapKeyRef, etc.)
+env:
+  # Database configuration - REQUIRED
+  # Provide PostgreSQL connection details from your external database
+  - name: DATABASE_HOST
+    valueFrom:
+      secretKeyRef:
+        name: dawarich-db # Change to your PostgreSQL secret name
+        key: host
+  - name: DATABASE_PORT
+    value: "5432"
+  - name: DATABASE_NAME
+    value: "dawarich"
+  - name: DATABASE_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: dawarich-db # Change to your PostgreSQL secret name
+        key: username
+  - name: DATABASE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: dawarich-db # Change to your PostgreSQL secret name
+        key: password
+
+  # Redis configuration - REQUIRED
+  # Provide Redis connection details from your external Redis instance
+  - name: REDIS_URL
+    valueFrom:
+      secretKeyRef:
+        name: dawarich-redis # Change to your Redis secret name
+        key: url
+
+  # Secret key base - OPTIONAL
+  # Either provide secretKeyBase value below, or create 'dawarich-app' secret manually
+  - name: SECRET_KEY_BASE
+    valueFrom:
+      secretKeyRef:
+        name: dawarich-app
+        key: secretKeyBase
+
+# Optional: Generate dawarich-app secret with this value
+# If not provided, you must manually create the 'dawarich-app' secret with:
+# kubectl create secret generic dawarich-app --from-literal=secretKeyBase=<random-string>
+# secretKeyBase: "generate-a-secure-random-value-here"
 
 dawarich:
   replicaCount: 1
@@ -73,10 +123,6 @@ dawarich:
 
   affinity: {}
 
-  env: []
-  # - name: ENV_NAME
-  #   value: ENV_VALUE
-
 sidekiq:
   replicaCount: 1
 
@@ -105,9 +151,6 @@ sidekiq:
     periodSeconds: 10
     failureThreshold: 10
     timeoutSeconds: 3
-  env: []
-  # - name: ENV_NAME
-  #   value: ENV_VALUE
 
   resources:
     {}
@@ -144,44 +187,10 @@ persistence:
     storageClass: ""
     size: 10Gi
 
-postgresql:
-  enabled: true
-  auth:
-    # Either set the postgresql credentials in the helm chart, or provide your own secret.
-    database: dawarich
-    password: changeme
-    username: dawarich
-    # existingSecret: dawarich-postgresql
-  primary:
-    persistence:
-      enabled: false
-      # storageClass: ""
-      # size: 8Gi
-    # https://github.com/Freika/dawarich/pull/569
-    extendedConfiguration: |-
-      shared_buffers = 512MB
-      work_mem = 128MB
-      maintenance_work_mem = 128MB
-      max_wal_size = 1GB
-      min_wal_size = 80MB
-      max_parallel_workers_per_gather = 4
-  shmVolume:
-    # As per upstream
-    sizeLimit: 1Gi
-
-redis:
-  enabled: true
-  auth:
-    enabled: true
-    password: changeme
-    # Use an existing secret for redis auth. Do this if you're using Argo to manage your instance or otherwise using helm template under the hood
-    #     The secret name can vary, but the password key must be redis-password.
-    # existingSecret: dawarich-redis-secret
-  master:
-    persistence:
-      enabled: false
-  replica:
-    replicaCount: 0
+# Database configuration via environment variables
+# Provide DATABASE_HOST, DATABASE_PASSWORD, REDIS_URL etc. via the env array below
+# or use existingEnvSecret to reference an existing Kubernetes secret
+# See examples in README.md for detailed instructions
 
 # This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
