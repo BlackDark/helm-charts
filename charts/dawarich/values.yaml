@@ -130,23 +130,23 @@ sidekiq:
   livenessProbe:
     exec:
       command:
-        - "sh"
-        - "-c"
-        - "bundle exec sidekiqmon processes | grep $${HOSTNAME}"
+        - pgrep
+        - -f
+        - sidekiq
     timeoutSeconds: 3
   readinessProbe:
     exec:
       command:
-        - "sh"
-        - "-c"
-        - "bundle exec sidekiqmon processes | grep $${HOSTNAME}"
+        - pgrep
+        - -f
+        - sidekiq
     timeoutSeconds: 3
   startupProbe:
     exec:
       command:
-        - "sh"
-        - "-c"
-        - "bundle exec sidekiqmon processes | grep $${HOSTNAME}"
+        - pgrep
+        - -f
+        - sidekiq
     initialDelaySeconds: 15
     periodSeconds: 10
     failureThreshold: 10
