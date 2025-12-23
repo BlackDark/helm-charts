@@ -88,6 +88,7 @@ jobs:
         if: steps.package_charts.outputs.changed_charts != ''
         with:
           skip_packaging: true
+          skip_upload: true
         env:
           CR_TOKEN: ${{ steps.app-token.outputs.token }}
           CR_PAGES_BRANCH: gh-pages
