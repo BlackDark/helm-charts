@@ -1,52 +1,77 @@
 {
-  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   extends: [
-    "config:recommended",
-    "customManagers:githubActionsVersions",
-    "schedule:monthly",
-    ":prConcurrentLimitNone",
-    ":prHourlyLimitNone",
-    ":pinVersions",
+    'config:recommended',
+    'customManagers:githubActionsVersions',
+    'schedule:monthly',
+    ':prConcurrentLimitNone',
+    ':prHourlyLimitNone',
+    ':pinVersions',
   ],
-  // remove examples from ignore path
   ignorePaths: [
-    "**/node_modules/**",
-    "**/bower_components/**",
-    "**/vendor/**",
-    "**/__tests__/**",
-    "**/test/**",
-    "**/tests/**",
-    "**/__fixtures__/**",
+    '**/node_modules/**',
+    '**/bower_components/**',
+    '**/vendor/**',
+    '**/__tests__/**',
+    '**/test/**',
+    '**/tests/**',
+    '**/__fixtures__/**',
   ],
-  labels: ["dependencies"],
+  labels: [
+    'dependencies',
+  ],
   packageRules: [
     {
-      matchUpdateTypes: ["minor", "patch", "pin"],
+      matchUpdateTypes: [
+        'minor',
+        'patch',
+        'pin',
+      ],
       automerge: true,
-      addLabels: ["automerge"],
+      addLabels: [
+        'automerge',
+      ],
     },
     {
-      groupName: "devDependencies (non-major)",
-      matchDepTypes: ["devDependencies"],
-      matchUpdateTypes: ["patch", "minor"],
+      groupName: 'devDependencies (non-major)',
+      matchDepTypes: [
+        'devDependencies',
+      ],
+      matchUpdateTypes: [
+        'patch',
+        'minor',
+      ],
     },
     {
-      groupName: "dependencies (non-major)",
-      matchDepTypes: ["dependencies"],
-      matchUpdateTypes: ["patch", "minor"],
+      groupName: 'dependencies (non-major)',
+      matchDepTypes: [
+        'dependencies',
+      ],
+      matchUpdateTypes: [
+        'patch',
+        'minor',
+      ],
     },
     {
-      matchDatasources: ["docker"],
-      matchUpdateTypes: ["minor", "patch"],
-      groupName: "all docker updates (without major)",
-      groupSlug: "all-docker",
+      matchDatasources: [
+        'docker',
+      ],
+      matchUpdateTypes: [
+        'minor',
+        'patch',
+      ],
+      groupName: 'all docker updates (without major)',
+      groupSlug: 'all-docker',
     },
   ],
-  regexManagers: [
+  customManagers: [
     {
-      fileMatch: ["\\.yaml$"],
+      customType: 'regex',
+      managerFilePatterns: [
+        '/\\.yaml$/',
+      ],
       matchStrings: [
-        "# ?renovate datasource=(?<datasource>.+?) depName=(?<depName>.+)\\n.+: [\"']?(?<currentValue>.+?)[\"']?\\n",
+        '# ?renovate datasource=(?<datasource>.+?) depName=(?<depName>.+)\\n.+: ["\']?(?<currentValue>.+?)["\']?\\n',
       ],
     },
   ],
