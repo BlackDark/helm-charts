@@ -84,20 +84,8 @@ jobs:
         run: |
           owner="${GITHUB_REPOSITORY_OWNER}"
           repo="${GITHUB_REPOSITORY#*/}"
-          cr upload \
-            --owner "$owner" \
-            --repo "$repo" \
-            --token "$CR_TOKEN" \
-            --package-path .cr-release-packages \
-            --skip-existing
+          cr upload -o "$owner" -r "$repo" -c "$(git rev-parse HEAD)" --skip-existing
           mkdir -p .cr-index
-          cr index \
-            --owner "$owner" \
-            --repo "$repo" \
-            --token "$CR_TOKEN" \
-            --charts-repo-url "https://${owner}.github.io/${repo}" \
-            --index-path .cr-index/index.yaml \
-            --push \
-            --pages-branch gh-pages
+          cr index -o "$owner" -r "$repo" --push --pages-branch gh-pages
         env:
           CR_TOKEN: ${{ steps.app-token.outputs.token }}
