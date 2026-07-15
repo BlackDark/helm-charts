@@ -162,7 +162,10 @@ Immutable values written to a ConfigMap. Most users won't need to change these:
 | `TIME_ZONE`                         | `Europe/Berlin`                                | Application timezone                                     |
 | `DISTANCE_UNIT`                     | `km`                                           | Distance unit (km or mi)                                 |
 | `APPLICATION_PROTOCOL`              | `http`                                         | Protocol for application URLs                            |
-| `BACKGROUND_PROCESSING_CONCURRENCY` | `10`                                           | Number of concurrent background jobs                     |
+| `WEB_CONCURRENCY`                   | `1`                                            | Puma worker count (raise for busier instances)           |
+| `BACKGROUND_PROCESSING_CONCURRENCY` | `3`                                            | Sidekiq job threads (raise temporarily for large imports) |
+| `SELF_HOSTED`                       | `true`                                         | Self-hosted deployment flag                              |
+| `STORE_GEODATA`                     | `true`                                         | Store reverse geocoding results                          |
 | `PHOTON_API_HOST`                   | `photon.komoot.io`                             | Geocoding service host                                   |
 | `PHOTON_API_USE_HTTPS`              | `true`                                         | Use HTTPS for geocoding API                              |
 | `RAILS_ENV`                         | `production`                                   | Rails environment                                        |
