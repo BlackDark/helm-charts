@@ -181,6 +181,13 @@ sidekiq:
   affinity: {}
 
 persistence:
+  storage:
+    enabled: true
+    existingClaim: ""
+    annotations: []
+    accessMode: "ReadWriteOnce"
+    storageClass: ""
+    size: 10Gi
   public:
     enabled: true
     existingClaim: ""
