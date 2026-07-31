@@ -102,6 +102,11 @@ Create the name of the service account to use
   persistentVolumeClaim:
     claimName: {{ default (printf "%s-watched" (include "dawarich.fullname" .)) .Values.persistence.watched.existingClaim }}
 {{- end }}
+{{- if .Values.persistence.storage.enabled }}
+- name: storage
+  persistentVolumeClaim:
+    claimName: {{ default (printf "%s-storage" (include "dawarich.fullname" .)) .Values.persistence.storage.existingClaim }}
+{{- end }}
 {{- if .Values.dawarich.extraVolumes }}
 {{ toYaml .Values.dawarich.extraVolumes }}
 {{- end }}
@@ -116,6 +121,10 @@ Create the name of the service account to use
 - name: watched
   mountPath: /var/app/tmp/imports/watched
 {{- end }}
+{{- if .Values.persistence.storage.enabled }}
+- name: storage
+  mountPath: /var/app/storage
+{{- end }}
 {{- if .Values.dawarich.extraVolumeMounts }}
 {{ toYaml .Values.dawarich.extraVolumeMounts }}
 {{- end }}
@@ -129,6 +138,10 @@ Create the name of the service account to use
 {{- if .Values.persistence.watched.enabled }}
 - name: watched
   mountPath: /var/app/tmp/imports/watched
+{{- end }}
+{{- if .Values.persistence.storage.enabled }}
+- name: storage
+  mountPath: /var/app/storage
 {{- end }}
 {{- if .Values.dawarich.extraVolumeMounts }}
 {{ toYaml .Values.dawarich.extraVolumeMounts }}
