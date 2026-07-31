@@ -130,6 +130,9 @@ Create the name of the service account to use
 - name: watched
   mountPath: /var/app/tmp/imports/watched
 {{- end }}
+{{- if .Values.dawarich.extraVolumeMounts }}
+{{ toYaml .Values.dawarich.extraVolumeMounts }}
+{{- end }}
 {{- end }}
 
 {{- define "dawarich.envFrom" -}}
