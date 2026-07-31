@@ -103,7 +103,7 @@ Create the name of the service account to use
     claimName: {{ default (printf "%s-watched" (include "dawarich.fullname" .)) .Values.persistence.watched.existingClaim }}
 {{- end }}
 {{- if .Values.dawarich.extraVolumes }}
-{{ toYaml .Values.dawarich.extraVolumes | indent 2 }}
+{{ toYaml .Values.dawarich.extraVolumes }}
 {{- end }}
 {{- end }}
 
@@ -117,7 +117,7 @@ Create the name of the service account to use
   mountPath: /var/app/tmp/imports/watched
 {{- end }}
 {{- if .Values.dawarich.extraVolumeMounts }}
-{{ toYaml .Values.dawarich.extraVolumeMounts | indent 2 }}
+{{ toYaml .Values.dawarich.extraVolumeMounts }}
 {{- end }}
 {{- end }}
 
