@@ -126,6 +126,12 @@ dawarich:
 
   affinity: {}
 
+  # Additional volumes on the output Deployment definition.
+  extraVolumes: []
+
+  # Additional volumeMounts on the output Deployment definition.
+  extraVolumeMounts: []
+
 sidekiq:
   replicaCount: 1
 
@@ -257,9 +263,3 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
-
-# Additional volumes on the output Deployment definition.
-extraVolumes: []
-
-# Additional volumeMounts on the output Deployment definition.
-extraVolumeMounts: []
