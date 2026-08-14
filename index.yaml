@@ -181,4 +181,26 @@ entries:
     urls:
     - https://github.com/BlackDark/helm-charts/releases/download/dawarich-0.1.0/dawarich-0.1.0.tgz
     version: 0.1.0
-generated: "2026-07-31T21:55:36.683470984Z"
+  yamtrack:
+  - apiVersion: v2
+    appVersion: 0.26.1
+    created: "2026-08-14T17:32:20.453562237Z"
+    description: Self-hosted media tracker for movies, TV, anime, manga, games, books,
+      comics, and board games
+    digest: 1bcc738e195655281e00ca7931a9649f0709b014d983854f54a519acd13086f6
+    home: https://github.com/FuzzyGrim/Yamtrack
+    keywords:
+    - yamtrack
+    - media
+    - tracker
+    - django
+    kubeVersion: '>=1.23.0-0'
+    name: yamtrack
+    sources:
+    - https://github.com/FuzzyGrim/Yamtrack
+    - https://fuzzygrim.github.io/Yamtrack/
+    type: application
+    urls:
+    - https://github.com/BlackDark/helm-charts/releases/download/yamtrack-0.1.0/yamtrack-0.1.0.tgz
+    version: 0.1.0
+generated: "2026-08-14T17:32:20.453589628Z"
