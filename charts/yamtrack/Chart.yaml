@@ -1,0 +1,17 @@
+apiVersion: v2
+name: yamtrack
+description: Self-hosted media tracker for movies, TV, anime, manga, games, books, comics, and board games
+type: application
+version: 0.1.0
+kubeVersion: ">=1.23.0-0"
+# renovate datasource=docker depName=ghcr.io/fuzzygrim/yamtrack
+appVersion: "0.26.1"
+home: https://github.com/FuzzyGrim/Yamtrack
+sources:
+  - https://github.com/FuzzyGrim/Yamtrack
+  - https://fuzzygrim.github.io/Yamtrack/
+keywords:
+  - yamtrack
+  - media
+  - tracker
+  - django

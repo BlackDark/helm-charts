@@ -1,0 +1,28 @@
+{{- if .Release.IsInstall }}
+Yamtrack installed.
+{{- else }}
+Yamtrack upgraded.
+{{- end }}
+
+1. Redis is required. Chart does not bundle it.
+   Set redis.url or redis.existingSecret.
+
+2. Django SECRET is {{ if .Values.secret.existingSecret }}read from {{ .Values.secret.existingSecret }}{{ else }}auto-generated and reused on upgrade{{ end }}.
+
+3. Database: {{ if .Values.postgresql.enabled }}PostgreSQL at {{ .Values.postgresql.host }}{{ else }}SQLite on the data volume ({{ .Values.persistence.mountPath }}){{ end }}.
+
+{{- if .Values.ingress.enabled }}
+
+4. Ingress host: {{ (index .Values.ingress.hosts 0).host }}
+   Set config.URLS to the public origin (https://host, no trailing slash).
+   CSRF and login POST fail if URLS does not match the browser origin.
+{{- else }}
+
+4. Access inside the cluster:
+   kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "yamtrack.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }}
+{{- end }}
+
+Create the first user in the UI, then set config.REGISTRATION: "false".
+
+Docs: https://fuzzygrim.github.io/Yamtrack/
+Env: https://github.com/FuzzyGrim/Yamtrack/wiki/Environment-Variables
