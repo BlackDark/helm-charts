@@ -19,5 +19,14 @@
         "# ?renovate datasource=(?<datasource>.+?) depName=(?<depName>.+)\\n.+: [\"']?(?<currentValue>.+?)[\"']?\\n",
       ],
     },
+    {
+      customType: "regex",
+      managerFilePatterns: ["/\\.github/workflows/.*\\.ya?ml$/"],
+      matchStrings: [
+        '# actionlint-local-archive\\s+ACTIONLINT_VERSION: "(?<currentValue>[^"]+)"\\s+ACTIONLINT_SHA256: "(?<currentDigest>[a-f0-9]{64})"',
+      ],
+      depNameTemplate: "rhysd/actionlint",
+      datasourceTemplate: "github-release-attachments",
+    },
   ],
 }
