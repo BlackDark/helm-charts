@@ -1,0 +1,14 @@
+[tools]
+actionlint = "1.7.12"
+helm = "4.3.2"
+
+[tasks.check]
+description = "Lint and render every chart"
+shell = "bash -c"
+run = '''
+set -euo pipefail
+for chart in charts/*; do
+  helm lint --strict "$chart"
+  helm template test "$chart" --set redis.url=redis://redis:6379/0 > /dev/null
+done
+'''

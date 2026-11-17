@@ -46,4 +46,6 @@ linuxserver-style `PUID`/`entrypoint` + supervisord/nginx as root: do **not** se
 
 ## Verify
 
-`helm lint`, `helm template` of fail paths, `kubectl apply --dry-run=client`, then install + `helm test`. Loop a review subagent until PASS. Unique test NS; uninstall + delete keep-PVCs + delete NS.
+`mise run check`: `helm lint --strict` and `helm template` for every chart. CI also runs actionlint, zizmor, and strict Renovate validation.
+
+For behavioral chart changes, also test fail paths, `kubectl apply --dry-run=client`, then install + `helm test`. Unique test NS; uninstall + delete keep-PVCs + delete NS.
